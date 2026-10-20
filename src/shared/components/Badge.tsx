@@ -15,10 +15,12 @@ export type BadgeProps = {
   children: ReactNode;
   tone?: BadgeTone;
   className?: string;
+  title?: string;
 };
 
-export const Badge = ({ children, tone = 'neutral', className }: BadgeProps) => (
+export const Badge = ({ children, tone = 'neutral', className, title = '' }: BadgeProps) => (
   <span
+    title={title}
     className={cn(
       'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
       TONE_CLASSES[tone],

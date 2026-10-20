@@ -1,38 +1,32 @@
-import { useTheme } from '@/shared/hooks/useTheme';
+import { Icon } from '@/shared/components/Icon';
 import { cn } from '@/shared/lib/cn';
-import type { Theme } from '@/shared/theme/themeContext';
+import { useTheme } from '@/shared/hooks/useTheme';
 
-const OPTIONS: Array<{ value: Theme; label: string }> = [
-  { value: 'light', label: 'Light' },
-  { value: 'dark', label: 'Dark' },
-  { value: 'system', label: 'System' },
-];
+export type ThemeToggleProps = {
+  className?: string;
+};
 
-export const ThemeToggle = () => {
-  const { theme, setTheme } = useTheme();
+export const ThemeToggle = ({ className }: ThemeToggleProps) => {
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  const label = isDark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap';
 
   return (
-    <div
-      role="group"
-      aria-label="Theme"
-      className="flex rounded-lg border border-slate-200 p-0.5 dark:border-slate-700"
+    <button
+      type="button"
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      aria-label={label}
+      aria-pressed={isDark}
+      title={label}
+      className={cn(
+        'grid h-9 w-9 place-items-center rounded-full border transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
+        isDark
+          ? 'border-brand-300 bg-brand-50 text-brand-700 dark:border-brand-400/40 dark:bg-brand-400/10 dark:text-brand-200'
+          : 'border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800',
+        className,
+      )}
     >
-      {OPTIONS.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          onClick={() => setTheme(option.value)}
-          aria-pressed={theme === option.value}
-          className={cn(
-            'rounded-md px-2 py-1 text-xs font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
-            theme === option.value
-              ? 'bg-brand-700 text-white'
-              : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
-          )}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
+      <Icon name="moon" className="h-4 w-4" />
+    </button>
   );
 };

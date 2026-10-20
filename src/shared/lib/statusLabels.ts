@@ -5,48 +5,44 @@ export type VehicleStatusInfo = {
   tone: BadgeTone;
 };
 
-const humanize = (value: string): string =>
-  value
-    .toLowerCase()
-    .replace(/_/g, ' ')
-    .replace(/^\w/, (character) => character.toUpperCase());
-
 const VEHICLE_STATUS: Record<string, VehicleStatusInfo> = {
-  IN_TRANSIT_TO: { label: 'In transit to', tone: 'success' },
-  INCOMING_AT: { label: 'Incoming at', tone: 'warning' },
-  STOPPED_AT: { label: 'Stopped at', tone: 'info' },
+  IN_TRANSIT_TO: { label: 'Sedang menuju', tone: 'success' },
+  INCOMING_AT: { label: 'Akan tiba di', tone: 'warning' },
+  STOPPED_AT: { label: 'Berhenti di', tone: 'info' },
+  LAYOVER: { label: 'Mangkal di', tone: 'warning' },
+  NOT_IN_SERVICE: { label: 'Tidak beroperasi', tone: 'danger' },
 };
 
 export const getVehicleStatus = (status: string | null | undefined): VehicleStatusInfo => {
   if (status && VEHICLE_STATUS[status]) {
     return VEHICLE_STATUS[status];
   }
-  return { label: status ? humanize(status) : 'Unknown', tone: 'neutral' };
+  return { label: status ?? 'Tidak diketahui', tone: 'neutral' };
 };
 
 const OCCUPANCY_LABELS: Record<string, string> = {
-  MANY_SEATS_AVAILABLE: 'Many seats available',
-  FEW_SEATS_AVAILABLE: 'Few seats available',
-  STANDING_ROOM_ONLY: 'Standing room only',
-  CRUSHED_STANDING_ROOM_ONLY: 'Crushed standing room only',
-  FULL: 'Full',
-  NOT_ACCEPTING_PASSENGERS: 'Not accepting passengers',
-  NO_DATA_AVAILABLE: 'No occupancy data',
+  MANY_SEATS_AVAILABLE: 'Banyak kursi tersedia',
+  FEW_SEATS_AVAILABLE: 'Sedikit kursi tersedia',
+  STANDING_ROOM_ONLY: 'Hanya berdiri',
+  CRUSHED_STANDING_ROOM_ONLY: 'Berdiri sangat padat',
+  FULL: 'Penuh',
+  NOT_ACCEPTING_PASSENGERS: 'Tidak menerima penumpang',
+  NO_DATA_AVAILABLE: 'Data okupansi tidak tersedia',
 };
 
 export const getOccupancyLabel = (status: string | null | undefined): string => {
   if (!status) {
     return '—';
   }
-  return OCCUPANCY_LABELS[status] ?? humanize(status);
+  return OCCUPANCY_LABELS[status] ?? status;
 };
 
 export const getRevenueLabel = (revenue: string | null | undefined): string => {
   if (revenue === 'REVENUE') {
-    return 'In revenue service';
+    return 'Dalam layanan';
   }
   if (revenue === 'NON_REVENUE') {
-    return 'Not in revenue service';
+    return 'Di luar layanan';
   }
   return revenue ?? '—';
 };
