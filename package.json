@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "description": "SMAR - Sistem Manajemen Armada (fleet management dashboard) consuming the MBTA v3 API",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -16,10 +19,12 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.59.0",
+    "dayjs": "^1.11.23",
     "leaflet": "^1.9.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-leaflet": "^4.2.1"
+    "react-leaflet": "^4.2.1",
+    "react-router-dom": "^6.30.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.0",
