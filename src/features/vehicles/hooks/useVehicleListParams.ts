@@ -10,7 +10,6 @@ export type VehicleListParams = {
   updateParams: (patch: Record<string, string | null>) => void;
 };
 
-/** Reads and writes the list state that lives in the URL (page, limit, filters). */
 export const useVehicleListParams = (): VehicleListParams => {
   const [searchParams, setSearchParams] = useSearchParams();
 

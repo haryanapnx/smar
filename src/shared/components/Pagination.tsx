@@ -12,23 +12,17 @@ export type PaginationProps = {
 };
 
 const arrowClasses =
-  'grid h-9 w-9 place-items-center rounded-lg border border-slate-200 text-slate-500 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800';
+  'grid h-[30px] w-[30px] place-items-center rounded-lg border border-slate-200 text-slate-500 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 sm:h-9 sm:w-9';
 
 const pageClasses = (isActive: boolean) =>
   cn(
-    'min-w-[2.25rem] rounded-lg px-3 py-1.5 text-sm font-medium transition',
+    'lg:min-w-[2.25rem] min-w-[1.25rem] rounded-lg px-3 py-1.5 lg:text-sm text-xs font-medium transition mx-1',
     isActive
       ? 'bg-brand-700 text-white'
       : 'border border-slate-200 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800',
   );
 
-export const Pagination = ({
-  page,
-  pageSize,
-  total,
-  onPageChange,
-  className,
-}: PaginationProps) => {
+export const Pagination = ({ page, pageSize, total, onPageChange, className }: PaginationProps) => {
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   if (totalPages <= 1) {
     return null;
@@ -48,7 +42,7 @@ export const Pagination = ({
         <Icon name="chevron" className="h-4 w-4 rotate-180" />
       </button>
 
-      <div className="hidden items-center gap-1 sm:flex">
+      <div className="items-center gap-1 sm:flex">
         {items.map((item, index) =>
           item === K_DOTS ? (
             <span
@@ -71,12 +65,6 @@ export const Pagination = ({
           ),
         )}
       </div>
-
-      <span className="px-2 text-xs text-slate-500 sm:hidden dark:text-slate-400">
-        Halaman{' '}
-        <strong className="font-semibold text-slate-700 dark:text-slate-200">{page}</strong> dari{' '}
-        {totalPages}
-      </span>
 
       <button
         type="button"
