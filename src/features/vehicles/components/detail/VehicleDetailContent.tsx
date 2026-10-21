@@ -1,8 +1,8 @@
 import { Suspense, lazy, useState } from 'react';
 import { Skeleton } from '@/shared/components/Skeleton';
 import { cn } from '@/shared/lib/cn';
-import { useTripStops } from '../../hooks/useTripStops';
-import type { VehicleDetail } from '../../types';
+import { useTripStops } from '@/api/trips';
+import type { VehicleDetail } from '@/api/types';
 import { RouteTripSummary } from './RouteTripSummary';
 import { TripStopsPanel } from './TripStopsPanel';
 import { VehicleAttributes } from './VehicleAttributes';
@@ -24,7 +24,7 @@ export type VehicleDetailContentProps = {
 
 export const VehicleDetailContent = ({ detail }: VehicleDetailContentProps) => {
   const [tab, setTab] = useState<Tab>('map');
-  const tripStops = useTripStops(detail.trip?.id);
+  const tripStops = useTripStops(detail?.trip?.id);
   const stopTotal = tripStops.data?.total;
 
   return (

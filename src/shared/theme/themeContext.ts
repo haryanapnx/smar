@@ -3,7 +3,7 @@ import { createContext } from 'react';
 export type Theme = 'light' | 'dark' | 'system';
 export type ResolvedTheme = 'light' | 'dark';
 
-export const THEME_STORAGE_KEY = 'smar:theme';
+export const K_THEME_STORAGE_KEY = 'smar:theme';
 
 export type ThemeContextValue = {
   theme: Theme;

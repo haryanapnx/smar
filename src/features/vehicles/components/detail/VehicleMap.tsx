@@ -4,16 +4,16 @@ import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { cn } from '@/shared/lib/cn';
 
-const LIGHT_TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-const ATTRIBUTION =
+const K_LIGHT_TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const K_ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
-const ICE_LAT = 42.36;
-const ICE_LNG = -71.06;
-const MIN_LAT = -85;
-const MAX_LAT = 85;
-const MIN_LNG = -180;
-const MAX_LNG = 180;
+const K_ICE_LAT = 42.36;
+const K_ICE_LNG = -71.06;
+const K_MIN_LAT = -85;
+const K_MAX_LAT = 85;
+const K_MIN_LNG = -180;
+const K_MAX_LNG = 180;
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
@@ -48,8 +48,8 @@ export const VehicleMap = ({
   className = 'h-72',
 }: VehicleMapProps) => {
   const center = useMemo<[number, number]>(() => {
-    const lat = Number.isFinite(latitude) ? clamp(latitude, MIN_LAT, MAX_LAT) : ICE_LAT;
-    const lng = Number.isFinite(longitude) ? clamp(longitude, MIN_LNG, MAX_LNG) : ICE_LNG;
+    const lat = Number.isFinite(latitude) ? clamp(latitude, K_MIN_LAT, K_MAX_LAT) : K_ICE_LAT;
+    const lng = Number.isFinite(longitude) ? clamp(longitude, K_MIN_LNG, K_MAX_LNG) : K_ICE_LNG;
     return [lat, lng];
   }, [latitude, longitude]);
 
@@ -63,7 +63,7 @@ export const VehicleMap = ({
         scrollWheelZoom={false}
         className="h-full w-full bg-slate-100 "
       >
-        <TileLayer key="light" url={LIGHT_TILES} attribution={ATTRIBUTION} />
+        <TileLayer key="light" url={K_LIGHT_TILES} attribution={K_ATTRIBUTION} />
         <Marker position={center} icon={markerIcon} title={label} />
         <Recenter center={center} zoom={14} />
       </MapContainer>

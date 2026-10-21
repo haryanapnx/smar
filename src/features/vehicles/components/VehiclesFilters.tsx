@@ -1,46 +1,62 @@
 import { MultiSelectDropdown, type MultiSelectOption } from '@/shared/components/MultiSelectDropdown';
 
+export type DropdownSource = {
+  options: MultiSelectOption[];
+  isLoading?: boolean;
+  isFetchingMore?: boolean;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
+  disabled?: boolean;
+  disabledHint?: string;
+};
+
 export type VehiclesFiltersProps = {
-  routeOptions: MultiSelectOption[];
-  tripOptions: MultiSelectOption[];
+  routes: DropdownSource;
+  trips: DropdownSource;
   selectedRoutes: string[];
   selectedTrips: string[];
   onRoutesChange: (values: string[]) => void;
   onTripsChange: (values: string[]) => void;
   onClear: () => void;
   onApply: () => void;
-  isLoadingRoutes?: boolean;
-  isLoadingTrips?: boolean;
 };
 
 export const VehiclesFilters = ({
-  routeOptions,
-  tripOptions,
+  routes,
+  trips,
   selectedRoutes,
   selectedTrips,
   onRoutesChange,
   onTripsChange,
   onClear,
   onApply,
-  isLoadingRoutes = false,
-  isLoadingTrips = false,
 }: VehiclesFiltersProps) => (
   <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_11rem]">
     <MultiSelectDropdown
       label="Rute"
       icon="route"
-      options={routeOptions}
+      options={routes.options}
       selected={selectedRoutes}
       onChange={onRoutesChange}
-      isLoading={isLoadingRoutes}
+      isLoading={routes.isLoading}
+      isFetchingMore={routes.isFetchingMore}
+      hasMore={routes.hasMore}
+      onLoadMore={routes.onLoadMore}
+      disabled={routes.disabled}
+      disabledHint={routes.disabledHint}
     />
     <MultiSelectDropdown
       label="Trip"
       icon="trip"
-      options={tripOptions}
+      options={trips.options}
       selected={selectedTrips}
       onChange={onTripsChange}
-      isLoading={isLoadingTrips}
+      isLoading={trips.isLoading}
+      isFetchingMore={trips.isFetchingMore}
+      hasMore={trips.hasMore}
+      onLoadMore={trips.onLoadMore}
+      disabled={trips.disabled}
+      disabledHint={trips.disabledHint}
     />
     <div className="flex flex-col justify-center gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900">
       <button

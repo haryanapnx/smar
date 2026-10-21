@@ -1,7 +1,7 @@
 import { ErrorState } from '@/shared/components/ErrorState';
 import { Modal } from '@/shared/components/Modal';
 import { getErrorMessage } from '@/shared/lib/format';
-import { useVehicleDetail } from '../../hooks/useVehicleDetail';
+import { useVehicleDetail } from '@/api/vehicles';
 import { VehicleDetailContent } from './VehicleDetailContent';
 import { VehicleDetailSkeleton } from './VehicleDetailSkeleton';
 

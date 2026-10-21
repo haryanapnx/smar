@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useIntersectionObserver } from '@/shared/hooks/useIntersectionObserver';
 import { cn } from '@/shared/lib/cn';
 import { Icon, type IconName } from './Icon';
 import { Spinner } from './Spinner';
@@ -15,6 +16,11 @@ export type MultiSelectDropdownProps = {
   selected: string[];
   onChange: (values: string[]) => void;
   isLoading?: boolean;
+  isFetchingMore?: boolean;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
+  disabled?: boolean;
+  disabledHint?: string;
   className?: string;
 };
 
@@ -25,11 +31,21 @@ export const MultiSelectDropdown = ({
   selected,
   onChange,
   isLoading = false,
+  isFetchingMore = false,
+  hasMore = false,
+  onLoadMore,
+  disabled = false,
+  disabledHint,
   className,
 }: MultiSelectDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const labelByValue = useMemo(
+    () => new Map(options.map((option) => [option.value, option.label])),
+    [options],
+  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -61,6 +77,15 @@ export const MultiSelectDropdown = ({
     return options.filter((option) => option.label.toLowerCase().includes(term));
   }, [options, query]);
 
+  const sentinelRef = useIntersectionObserver<HTMLDivElement>({
+    onIntersect: () => {
+      if (hasMore && !isFetchingMore) {
+        onLoadMore?.();
+      }
+    },
+    enabled: isOpen && !disabled && hasMore && !isLoading,
+  });
+
   const toggleOption = (value: string) =>
     onChange(
       selected.includes(value)
@@ -73,6 +98,7 @@ export const MultiSelectDropdown = ({
       ref={containerRef}
       className={cn(
         'relative min-w-0 rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition focus-within:border-brand-300 focus-within:ring-2 focus-within:ring-brand-100 dark:border-slate-700 dark:bg-slate-900 dark:focus-within:ring-brand-900/30',
+        disabled && 'opacity-70',
         className,
       )}
     >
@@ -86,7 +112,8 @@ export const MultiSelectDropdown = ({
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        className="mt-2 flex w-full items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left text-xs transition hover:border-brand-300 hover:bg-white dark:border-slate-700 dark:bg-slate-950 dark:hover:bg-slate-900"
+        disabled={disabled}
+        className="mt-2 flex w-full items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left text-xs transition hover:border-brand-300 hover:bg-white disabled:cursor-not-allowed disabled:hover:border-slate-200 disabled:hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:hover:bg-slate-900"
       >
         <span
           className={cn(
@@ -116,16 +143,18 @@ export const MultiSelectDropdown = ({
               onClick={() => toggleOption(value)}
               className="inline-flex max-w-full items-center gap-1 rounded-md bg-brand-50 px-2 py-1 text-[10px] font-medium text-brand-700 hover:bg-brand-100 dark:bg-brand-900/40 dark:text-brand-100 dark:hover:bg-brand-900/70"
             >
-              <span className="truncate">{value}</span>
+              <span className="truncate">{labelByValue.get(value) ?? value}</span>
               <Icon name="close" className="h-3 w-3 shrink-0" />
             </button>
           ))}
         </div>
       ) : (
-        <p className="mt-2 text-[11px] text-slate-400">Cari dan pilih lebih dari satu.</p>
+        <p className="mt-2 text-[11px] text-slate-400">
+          {disabled && disabledHint ? disabledHint : 'Cari dan pilih lebih dari satu.'}
+        </p>
       )}
 
-      {isOpen ? (
+      {isOpen && !disabled ? (
         <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-20 overflow-hidden rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900 dark:shadow-black/40">
           <input
             value={query}
@@ -141,25 +170,34 @@ export const MultiSelectDropdown = ({
                 <Spinner label="Memuat…" />
               </div>
             ) : (
-              visibleOptions.map((option) => (
-                <label
-                  key={option.value}
-                  className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-xs text-slate-700 hover:bg-brand-50 dark:text-slate-200 dark:hover:bg-brand-900/30"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(option.value)}
-                    onChange={() => toggleOption(option.value)}
-                    className="h-3.5 w-3.5 rounded border-slate-300 text-brand-700 focus:ring-brand-500"
-                  />
-                  <span className="truncate">{option.label}</span>
-                </label>
-              ))
-            )}
+              <>
+                {visibleOptions.map((option) => (
+                  <label
+                    key={option.value}
+                    className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-xs text-slate-700 hover:bg-brand-50 dark:text-slate-200 dark:hover:bg-brand-900/30"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(option.value)}
+                      onChange={() => toggleOption(option.value)}
+                      className="h-3.5 w-3.5 rounded border-slate-300 text-brand-700 focus:ring-brand-500"
+                    />
+                    <span className="truncate">{option.label}</span>
+                  </label>
+                ))}
 
-            {!isLoading && !visibleOptions.length ? (
-              <p className="px-2 py-3 text-center text-xs text-slate-400">Tidak ada hasil.</p>
-            ) : null}
+                {!visibleOptions.length ? (
+                  <p className="px-2 py-3 text-center text-xs text-slate-400">Tidak ada hasil.</p>
+                ) : null}
+
+                {hasMore ? <div ref={sentinelRef} className="h-4" aria-hidden="true" /> : null}
+                {isFetchingMore ? (
+                  <div className="flex justify-center py-1">
+                    <Spinner />
+                  </div>
+                ) : null}
+              </>
+            )}
           </div>
 
           <div className="mt-2 flex justify-between border-t border-slate-100 pt-2 dark:border-slate-800">

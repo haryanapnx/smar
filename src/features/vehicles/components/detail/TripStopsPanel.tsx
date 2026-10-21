@@ -2,8 +2,8 @@ import { Badge } from '@/shared/components/Badge';
 import { Skeleton } from '@/shared/components/Skeleton';
 import { cn } from '@/shared/lib/cn';
 import { getErrorMessage } from '@/shared/lib/format';
-import { useTripStops } from '../../hooks/useTripStops';
-import type { VehicleDetail } from '../../types';
+import { useTripStops } from '@/api/trips';
+import type { VehicleDetail } from '@/api/types';
 
 export type TripStopsPanelProps = {
   detail: VehicleDetail;

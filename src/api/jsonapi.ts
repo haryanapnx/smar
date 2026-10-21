@@ -1,23 +1,21 @@
+import { env } from '@/shared/config/env';
+import { K_PAGE_LIMIT, K_PAGE_OFFSET } from '@/shared/constants';
 import type {
   JsonApiCollection,
   JsonApiLinks,
   JsonApiResource,
   JsonApiResponse,
-} from './types';
-import { resourceKey } from './types';
-
-const PAGE_OFFSET = 'page[offset]';
-const PAGE_LIMIT = 'page[limit]';
-const FALLBACK_ORIGIN = 'https://api-v3.mbta.com';
+} from './jsonapi.types';
+import { resourceKey } from './jsonapi.types';
 
 export const deriveTotal = (links?: JsonApiLinks, fallbackLimit?: number): number | null => {
   if (!links?.last) {
     return null;
   }
   try {
-    const url = new URL(links.last, FALLBACK_ORIGIN);
-    const offset = Number(url.searchParams.get(PAGE_OFFSET));
-    const limit = Number(url.searchParams.get(PAGE_LIMIT) ?? fallbackLimit);
+    const url = new URL(links.last, env.mbtaApiBaseUrl);
+    const offset = Number(url.searchParams.get(K_PAGE_OFFSET));
+    const limit = Number(url.searchParams.get(K_PAGE_LIMIT) ?? fallbackLimit);
     if (!Number.isFinite(offset) || !Number.isFinite(limit) || limit <= 0) {
       return null;
     }

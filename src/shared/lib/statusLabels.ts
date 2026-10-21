@@ -5,7 +5,7 @@ export type VehicleStatusInfo = {
   tone: BadgeTone;
 };
 
-const VEHICLE_STATUS: Record<string, VehicleStatusInfo> = {
+const K_VEHICLE_STATUS: Record<string, VehicleStatusInfo> = {
   IN_TRANSIT_TO: { label: 'Sedang menuju', tone: 'success' },
   INCOMING_AT: { label: 'Akan tiba di', tone: 'warning' },
   STOPPED_AT: { label: 'Berhenti di', tone: 'info' },
@@ -14,27 +14,27 @@ const VEHICLE_STATUS: Record<string, VehicleStatusInfo> = {
 };
 
 export const getVehicleStatus = (status: string | null | undefined): VehicleStatusInfo => {
-  if (status && VEHICLE_STATUS[status]) {
-    return VEHICLE_STATUS[status];
+  if (status && K_VEHICLE_STATUS[status]) {
+    return K_VEHICLE_STATUS[status];
   }
   return { label: status ?? 'Tidak diketahui', tone: 'neutral' };
 };
 
-const OCCUPANCY_LABELS: Record<string, string> = {
-  MANY_SEATS_AVAILABLE: 'Banyak kursi tersedia',
-  FEW_SEATS_AVAILABLE: 'Sedikit kursi tersedia',
-  STANDING_ROOM_ONLY: 'Hanya berdiri',
-  CRUSHED_STANDING_ROOM_ONLY: 'Berdiri sangat padat',
+const K_OCCUPANCY_LABELS: Record<string, string> = {
+  MANY_SEATS_AVAILABLE: 'Banyak kursi kosong',
+  FEW_SEATS_AVAILABLE: 'Kursi tinggal sedikit',
+  STANDING_ROOM_ONLY: 'Hanya ruang berdiri',
+  CRUSHED_STANDING_ROOM_ONLY: 'Sangat padat / sesak',
   FULL: 'Penuh',
-  NOT_ACCEPTING_PASSENGERS: 'Tidak menerima penumpang',
-  NO_DATA_AVAILABLE: 'Data okupansi tidak tersedia',
+  NOT_ACCEPTING_PASSENGERS: 'Tidak melayani penumpang',
+  NO_DATA_AVAILABLE: 'Belum ada info ketersediaan',
 };
 
 export const getOccupancyLabel = (status: string | null | undefined): string => {
   if (!status) {
     return '—';
   }
-  return OCCUPANCY_LABELS[status] ?? status;
+  return K_OCCUPANCY_LABELS[status] ?? status;
 };
 
 export const getRevenueLabel = (revenue: string | null | undefined): string => {

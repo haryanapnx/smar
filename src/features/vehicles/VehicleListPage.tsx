@@ -1,11 +1,14 @@
-import { Suspense, lazy, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Suspense, lazy, useMemo, useState } from 'react';
+import { routeOptionLabel, useRoutes } from '@/api/routes';
+import { tripOptionLabel, useTrips } from '@/api/trips';
+import { useVehicles } from '@/api/vehicles';
 import { Skeleton } from '@/shared/components/Skeleton';
-import { patchSearchParams, readIntParam, readListParam } from '@/shared/lib/queryParams';
-import { useVehicles } from './hooks/useVehicles';
 import { VehicleList } from './components/VehicleList';
 import { VehiclesFilters } from './components/VehiclesFilters';
 import { VehiclesPagination } from './components/VehiclesPagination';
+import { K_PAGE_SIZE_OPTIONS } from './constants';
+import { useVehicleFilterDraft } from './hooks/useVehicleFilterDraft';
+import { useVehicleListParams } from './hooks/useVehicleListParams';
 
 const VehicleDetailModal = lazy(() =>
   import('./components/detail').then((module) => ({ default: module.VehicleDetailModal })),
@@ -23,31 +26,37 @@ const ModalFallback = () => (
   </div>
 );
 
-const PAGE_SIZE_OPTIONS = [12, 24, 48];
-const DEFAULT_PAGE_SIZE = 12;
-
 export const VehicleListPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const page = Math.max(1, readIntParam(searchParams, 'page', 1));
-  const pageSize = readIntParam(searchParams, 'limit', DEFAULT_PAGE_SIZE);
-  const routeIds = readListParam(searchParams, 'routes');
-  const tripIds = readListParam(searchParams, 'trips');
-
-  const [draftRoutes, setDraftRoutes] = useState<string[]>(routeIds);
-  const [draftTrips, setDraftTrips] = useState<string[]>(tripIds);
+  const { page, pageSize, routeIds, tripIds, updateParams } = useVehicleListParams();
+  const { draftRoutes, draftTrips, setDraftTrips, changeRoutes, reset } = useVehicleFilterDraft({
+    routeIds,
+    tripIds,
+  });
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
-
-  const routeKey = routeIds.join(',');
-  const tripKey = tripIds.join(',');
-  useEffect(() => setDraftRoutes(routeKey ? routeKey.split(',') : []), [routeKey]);
-  useEffect(() => setDraftTrips(tripKey ? tripKey.split(',') : []), [tripKey]);
-
-  const updateParams = (patch: Record<string, string | null>) =>
-    setSearchParams(patchSearchParams(searchParams, patch));
 
   const query = useVehicles({ page, pageSize, routeIds, tripIds });
   const total = query.data?.total ?? 0;
+
+  // Filter options: routes are loaded lazily page by page; trips are scoped to the
+  // routes currently being drafted (unfiltered /trips times out on the MBTA side).
+  const routesQuery = useRoutes();
+  const tripsQuery = useTrips(draftRoutes);
+
+  const routeOptions = useMemo(
+    () =>
+      (routesQuery.data?.pages ?? [])
+        .flatMap((pageResult) => pageResult.items)
+        .map((route) => ({ value: route.id, label: routeOptionLabel(route) })),
+    [routesQuery.data],
+  );
+
+  const tripOptions = useMemo(
+    () =>
+      (tripsQuery.data?.pages ?? [])
+        .flatMap((pageResult) => pageResult.items)
+        .map((trip) => ({ value: trip.id, label: tripOptionLabel(trip) })),
+    [tripsQuery.data],
+  );
 
   const isGridLoading = query.isLoading || query.isPlaceholderData;
   const isBackgroundFetching = query.isFetching && !isGridLoading;
@@ -65,8 +74,7 @@ export const VehicleListPage = () => {
     });
 
   const handleClear = () => {
-    setDraftRoutes([]);
-    setDraftTrips([]);
+    reset();
     updateParams({ routes: null, trips: null, page: '1' });
   };
 
@@ -82,11 +90,29 @@ export const VehicleListPage = () => {
       </header>
 
       <VehiclesFilters
-        routeOptions={[]}
-        tripOptions={[]}
+        routes={{
+          options: routeOptions,
+          isLoading: routesQuery.isLoading,
+          isFetchingMore: routesQuery.isFetchingNextPage,
+          hasMore: routesQuery.hasNextPage,
+          onLoadMore: () => {
+            void routesQuery.fetchNextPage();
+          },
+        }}
+        trips={{
+          options: tripOptions,
+          isLoading: tripsQuery.isLoading,
+          isFetchingMore: tripsQuery.isFetchingNextPage,
+          hasMore: tripsQuery.hasNextPage,
+          onLoadMore: () => {
+            void tripsQuery.fetchNextPage();
+          },
+          disabled: draftRoutes.length === 0,
+          disabledHint: 'Pilih rute dulu untuk memuat trip.',
+        }}
         selectedRoutes={draftRoutes}
         selectedTrips={draftTrips}
-        onRoutesChange={setDraftRoutes}
+        onRoutesChange={changeRoutes}
         onTripsChange={setDraftTrips}
         onClear={handleClear}
         onApply={handleApply}
@@ -106,7 +132,7 @@ export const VehicleListPage = () => {
         page={page}
         pageSize={pageSize}
         total={total}
-        pageSizeOptions={PAGE_SIZE_OPTIONS}
+        pageSizeOptions={K_PAGE_SIZE_OPTIONS}
         onPageChange={handlePageChange}
         onPageSizeChange={(size) => updateParams({ limit: String(size), page: '1' })}
         isLoading={query.isLoading}

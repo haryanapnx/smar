@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
-  THEME_STORAGE_KEY,
+  K_THEME_STORAGE_KEY,
   ThemeContext,
   type ResolvedTheme,
   type Theme,
   type ThemeContextValue,
 } from './themeContext';
 
-const DARK_MEDIA_QUERY = '(prefers-color-scheme: dark)';
+const K_DARK_MEDIA_QUERY = '(prefers-color-scheme: dark)';
 
 const readStoredTheme = (): Theme => {
   try {
-    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    const stored = localStorage.getItem(K_THEME_STORAGE_KEY);
     if (stored === 'light' || stored === 'dark' || stored === 'system') {
       return stored;
     }
@@ -23,7 +23,7 @@ const readStoredTheme = (): Theme => {
 
 const systemPrefersDark = (): boolean =>
   typeof window !== 'undefined' && typeof window.matchMedia === 'function'
-    ? window.matchMedia(DARK_MEDIA_QUERY).matches
+    ? window.matchMedia(K_DARK_MEDIA_QUERY).matches
     : false;
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
@@ -34,7 +34,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
       return;
     }
-    const media = window.matchMedia(DARK_MEDIA_QUERY);
+    const media = window.matchMedia(K_DARK_MEDIA_QUERY);
     const handleChange = (event: MediaQueryListEvent) => setSystemDark(event.matches);
     media.addEventListener('change', handleChange);
     return () => media.removeEventListener('change', handleChange);
@@ -50,7 +50,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const setTheme = useCallback((next: Theme) => {
     setThemeState(next);
     try {
-      localStorage.setItem(THEME_STORAGE_KEY, next);
+      localStorage.setItem(K_THEME_STORAGE_KEY, next);
     } catch {
       /* localStorage unavailable */
     }

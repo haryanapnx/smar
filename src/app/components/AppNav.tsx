@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { cn } from '@/shared/lib/cn';
 import { ThemeToggle } from './ThemeToggle';
 
-const NAV_ITEMS = [
+const K_NAV_ITEMS = [
   { to: '/vehicles', label: 'Fleet Management', active: true },
   { to: '/vehicles', label: 'Map', active: false },
   { to: '/vehicles', label: 'Routes', active: false },
@@ -17,7 +17,7 @@ export const AppNav = ({ className, mobile = false }: { className?: string; mobi
     )}
     aria-label="Primary"
   >
-    {NAV_ITEMS.map((item) => (
+    {K_NAV_ITEMS.map((item) => (
       <NavLink
         key={item.label}
         to={item.to}
@@ -33,6 +33,8 @@ export const AppNav = ({ className, mobile = false }: { className?: string; mobi
         {item.label}
       </NavLink>
     ))}
-    <ThemeToggle />
+    <div className="lg:hidden">
+      <ThemeToggle />
+    </div>
   </nav>
 );

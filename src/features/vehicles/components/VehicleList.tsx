@@ -2,7 +2,7 @@ import { EmptyState } from '@/shared/components/EmptyState';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { cn } from '@/shared/lib/cn';
 import { getErrorMessage } from '@/shared/lib/format';
-import type { Vehicle } from '../types';
+import type { Vehicle } from '@/api/types';
 import { VehicleCard } from './VehicleCard';
 import { VehicleCardSkeleton } from './VehicleCardSkeleton';
 

@@ -1,5 +1,5 @@
 import { cn } from '@/shared/lib/cn';
-import type { VehicleRoute } from '../types';
+import type { VehicleRoute } from '@/api/types';
 
 export type RouteMarkerProps = {
   route: VehicleRoute | null;

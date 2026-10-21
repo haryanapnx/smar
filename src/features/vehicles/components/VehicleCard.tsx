@@ -1,7 +1,7 @@
 import { Icon } from '@/shared/components/Icon';
 import { cn } from '@/shared/lib/cn';
 import { formatCoordinates, formatRelativeTime } from '@/shared/lib/format';
-import type { Vehicle } from '../types';
+import type { Vehicle } from '@/api/types';
 import { routeLabel } from '../lib/routeLabel';
 import { RouteMarker } from './RouteMarker';
 import { VehicleArtwork } from './VehicleArtwork';

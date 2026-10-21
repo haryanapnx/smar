@@ -1,7 +1,8 @@
-import { firstRelationshipId, indexIncluded, parseCollection } from '@/shared/api/jsonapi';
-import { mbtaFetch } from '@/shared/api/mbtaClient';
-import type { JsonApiResource, JsonApiResponse } from '@/shared/api/types';
-import { resourceKey } from '@/shared/api/types';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { mbtaFetch } from './client';
+import { firstRelationshipId, indexIncluded, parseCollection } from './jsonapi';
+import type { JsonApiResource, JsonApiResponse } from './jsonapi.types';
+import { resourceKey } from './jsonapi.types';
 import type {
   Vehicle,
   VehicleDetail,
@@ -10,7 +11,7 @@ import type {
   VehicleTrip,
   VehiclesPageResult,
   VehiclesQuery,
-} from '../types';
+} from './types';
 
 type VehicleAttributes = {
   label: string | null;
@@ -124,6 +125,12 @@ const toVehicleDetail = (
   };
 };
 
+export const vehicleKeys = {
+  all: ['vehicles'] as const,
+  list: (query: VehiclesQuery) => [...vehicleKeys.all, 'list', query] as const,
+  detail: (id: string) => [...vehicleKeys.all, 'detail', id] as const,
+};
+
 export const fetchVehicles = async (query: VehiclesQuery): Promise<VehiclesPageResult> => {
   const { page, pageSize, routeIds, tripIds } = query;
   const offset = (page - 1) * pageSize;
@@ -163,3 +170,19 @@ export const fetchVehicleDetail = async (id: string): Promise<VehicleDetail> => 
 
   return toVehicleDetail(resource, indexIncluded(included));
 };
+
+export const useVehicles = (query: VehiclesQuery) =>
+  useQuery({
+    queryKey: vehicleKeys.list(query),
+    queryFn: () => fetchVehicles(query),
+    placeholderData: keepPreviousData,
+    staleTime: 0,
+  });
+
+export const useVehicleDetail = (id: string | null) =>
+  useQuery({
+    queryKey: vehicleKeys.detail(id ?? ''),
+    queryFn: () => fetchVehicleDetail(id as string),
+    enabled: Boolean(id),
+    staleTime: 0,
+  });

@@ -1,8 +1,5 @@
-export const MBTA_BASE_URL = 'https://api-v3.mbta.com';
-
-const API_KEY_HEADER = 'X-API-Key';
-
-const envApiKey = (import.meta.env.VITE_MBTA_API_KEY ?? '').trim();
+import { env } from '@/shared/config/env';
+import { K_API_KEY_HEADER } from '@/shared/constants';
 
 export type QueryValue = string | number | boolean | Array<string | number> | null | undefined;
 
@@ -36,7 +33,7 @@ export const buildSearchParams = (params: Record<string, QueryValue>): URLSearch
 
 export const buildUrl = (path: string, params: Record<string, QueryValue> = {}): string => {
   const query = buildSearchParams(params).toString();
-  return `${MBTA_BASE_URL}${path}${query ? `?${query}` : ''}`;
+  return `${env.mbtaApiBaseUrl}${path}${query ? `?${query}` : ''}`;
 };
 
 export const messageForStatus = (status: number): string => {
@@ -44,13 +41,13 @@ export const messageForStatus = (status: number): string => {
     return 'The MBTA API rejected the request (HTTP 400).';
   }
   if (status === 401 || status === 403) {
-    return 'The MBTA API key was rejected (HTTP 403). Please check the key in Settings.';
+    return 'The MBTA API key was rejected (HTTP 403). Check VITE_MBTA_API_KEY in your .env.local.';
   }
   if (status === 404) {
     return 'The requested data could not be found (HTTP 404).';
   }
   if (status === 429) {
-    return 'Too many requests. The MBTA API is rate-limiting this app. Add an API key in Settings and try again shortly.';
+    return 'Too many requests. The MBTA API is rate-limiting this app. Set VITE_MBTA_API_KEY in your .env.local and try again shortly.';
   }
   if (status >= 500) {
     return `The MBTA API is having trouble (HTTP ${status}). Please try again in a moment.`;
@@ -70,12 +67,12 @@ export const mbtaFetch = async <T>(
 ): Promise<T> => {
   const { params = {}, apiKey, signal } = options;
   const url = buildUrl(path, params);
-  const key = apiKey?.trim() || envApiKey;
+  const key = apiKey?.trim() || env.mbtaApiKey;
 
   let response: Response;
   try {
     response = await fetch(url, {
-      headers: key ? { [API_KEY_HEADER]: key } : undefined,
+      headers: key ? { [K_API_KEY_HEADER]: key } : undefined,
       signal,
     });
   } catch (error) {

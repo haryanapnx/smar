@@ -1,5 +1,6 @@
+import { K_DOTS } from '@/shared/constants';
 import { cn } from '@/shared/lib/cn';
-import { DOTS, getPageItems } from '@/shared/lib/pagination';
+import { getPageItems } from '@/shared/lib/pagination';
 import { Icon } from './Icon';
 
 export type PaginationProps = {
@@ -49,7 +50,7 @@ export const Pagination = ({
 
       <div className="hidden items-center gap-1 sm:flex">
         {items.map((item, index) =>
-          item === DOTS ? (
+          item === K_DOTS ? (
             <span
               key={`dots-${index}`}
               className="px-2 text-slate-400 dark:text-slate-500"

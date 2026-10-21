@@ -27,7 +27,7 @@ export const AppHeader = () => {
           </span>
         </Link>
 
-        <AppNav className="ml-2" />
+        <AppNav className="ml-6 lg:ml-8" />
 
         <div className="ml-auto flex items-center gap-3">
           <div className="hidden lg:block">

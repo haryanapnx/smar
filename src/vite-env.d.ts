@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_MBTA_API_KEY?: string;
+  readonly VITE_MBTA_API_BASE_URL?: string;
 }
 
 interface ImportMeta {

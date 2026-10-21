@@ -2,13 +2,13 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/shared/lib/cn';
 
-const SIZES = {
+const K_MODAL_SIZES = {
   md: 'max-w-2xl',
   lg: 'max-w-4xl',
   xl: 'max-w-5xl',
 } as const;
 
-export type ModalSize = keyof typeof SIZES;
+export type ModalSize = keyof typeof K_MODAL_SIZES;
 
 export type ModalProps = {
   open: boolean;
@@ -74,7 +74,7 @@ export const Modal = ({
         onClick={(event) => event.stopPropagation()}
         className={cn(
           'flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden rounded-2xl bg-white shadow-2xl outline-none dark:border dark:border-slate-700/80 dark:bg-slate-900 dark:shadow-black/70 sm:max-h-[calc(100vh-3rem)]',
-          SIZES[size],
+          K_MODAL_SIZES[size],
           className,
         )}
       >

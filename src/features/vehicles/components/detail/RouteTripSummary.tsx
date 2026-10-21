@@ -1,6 +1,6 @@
 import { getRevenueLabel } from '@/shared/lib/statusLabels';
 import { routeLabel } from '../../lib/routeLabel';
-import type { VehicleDetail } from '../../types';
+import type { VehicleDetail } from '@/api/types';
 import { RouteMarker } from '../RouteMarker';
 import { directionText, stopText, tripText } from '../../lib/detailText';
 

@@ -1,4 +1,4 @@
-import type { VehicleDetail } from '../types';
+import type { VehicleDetail } from '@/api/types';
 
 export const tripText = (detail: VehicleDetail): string =>
   detail.trip?.headsign || detail.trip?.name || '—';
