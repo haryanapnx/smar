@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { AppNav } from './AppNav';
 import { ThemeToggle } from './ThemeToggle';
@@ -13,7 +14,6 @@ export const AppHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
-  // Close the mobile menu whenever the route changes (covers back/forward too).
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
@@ -22,33 +22,54 @@ export const AppHeader = () => {
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/90">
-      <div className="relative mx-auto flex h-14 w-full max-w-[1440px] items-center gap-4 px-4 sm:px-6 lg:px-8 justify-between">
+      {isMenuOpen
+        ? createPortal(
+            <button
+              type="button"
+              onClick={closeMenu}
+              aria-label="Tutup menu"
+              className="fixed inset-0 z-20 bg-slate-950/30 backdrop-blur-sm sm:hidden dark:bg-slate-950/60"
+            />,
+            document.body,
+          )
+        : null}
+
+      <div className="relative mx-auto flex h-16 w-full max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:h-[72px] lg:px-8">
         <Link
           to="/"
-          className="min-w-[10rem] flex items-center gap-2.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+          className="flex shrink-0 items-center gap-2.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-700 text-white shadow-sm">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-700 text-white shadow-sm">
             <BusIcon />
           </span>
-          <span className="text-base font-bold italic tracking-tight text-brand-700 dark:text-brand-100">
-            SMAR
-          </span>
+
+          <div>
+            <span className="text-base font-bold italic tracking-tight text-brand-700 dark:text-brand-100">
+              SMAR
+            </span>
+            <p className="whitespace-nowrap text-[10px] italic text-slate-500 dark:text-slate-400">
+              Sistem Manajemen Armada
+            </p>
+          </div>
         </Link>
 
-        <AppNav className="ml-6 lg:ml-8" />
+        <div className="absolute left-1/2 hidden -translate-x-1/2 sm:block">
+          <AppNav className="ml-0" />
+        </div>
 
-        <div className="ml-auto flex items-center gap-3">
-          <div className="hidden lg:block">
+        <div className="ml-auto flex shrink-0 items-center gap-3">
+          <div className="hidden sm:block">
             <ThemeToggle />
           </div>
+
           <button
             type="button"
             onClick={() => setIsMenuOpen((open) => !open)}
             aria-expanded={isMenuOpen}
             aria-controls="mobile-primary-navigation"
+            aria-label={isMenuOpen ? 'Tutup menu' : 'Buka menu'}
             className="grid h-9 w-9 place-items-center rounded-lg border border-slate-200 text-slate-600 transition hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 sm:hidden dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
           >
-            <span className="sr-only">{isMenuOpen ? 'Tutup menu' : 'Buka menu'}</span>
             <svg
               viewBox="0 0 24 24"
               className="h-5 w-5"
@@ -66,14 +87,27 @@ export const AppHeader = () => {
             </svg>
           </button>
         </div>
-        {isMenuOpen ? (
+
+        {isMenuOpen && (
           <div
             id="mobile-primary-navigation"
-            className="absolute inset-x-4 top-[calc(100%+0.5rem)] rounded-xl border border-slate-200 bg-white p-1 shadow-xl sm:hidden dark:border-slate-700 dark:bg-slate-900"
+            className="absolute inset-x-4 top-[calc(100%+0.5rem)] z-20 rounded-xl border border-slate-200 bg-white p-2 shadow-xl sm:hidden dark:border-slate-700 dark:bg-slate-900 pb-4"
           >
             <AppNav mobile onNavigate={closeMenu} />
+
+            <div className="mt-2 flex items-center gap-3 border-t border-slate-200 px-2 pt-3 dark:border-slate-700">
+              <span className="grid h-10 w-10 shrink-0 place-items-center text-slate-600  dark:text-slate-300">
+                <ThemeToggle />
+              </span>
+
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Ubah tema tampilan aplikasi
+                </p>
+              </div>
+            </div>
           </div>
-        ) : null}
+        )}
       </div>
     </header>
   );

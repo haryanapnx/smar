@@ -1,0 +1,22 @@
+node_modules
+dist
+coverage
+.git
+.gitignore
+.vite
+*.log
+
+# Local secrets — build args are passed explicitly instead
+.env
+.env.*
+!.env.example
+
+# Local reference assets (not needed by the build)
+*.png
+vehicles_response.json
+
+# Agent / planning artefacts
+.commandcode
+SPEC.md
+tasks
+Tes_Teknis_Frontend.md

@@ -1,6 +1,5 @@
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/shared/lib/cn';
-import { ThemeToggle } from './ThemeToggle';
 
 const K_NAV_ITEMS = [
   { to: '/vehicles', label: 'Manajemen Armada' },
@@ -38,8 +37,5 @@ export const AppNav = ({ className, mobile = false, onNavigate }: AppNavProps) =
         {item.label}
       </NavLink>
     ))}
-    <div className="lg:hidden">
-      <ThemeToggle />
-    </div>
   </nav>
 );

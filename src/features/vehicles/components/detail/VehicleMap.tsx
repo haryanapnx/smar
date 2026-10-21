@@ -6,7 +6,7 @@ import { cn } from '@/shared/lib/cn';
 
 const K_LIGHT_TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const K_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
 const K_ICE_LAT = 42.36;
 const K_ICE_LNG = -71.06;
