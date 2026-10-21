@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useRoutes } from '@/api/routes';
+import { useRoutes, useRoutesTotal } from '@/api/routes';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { Spinner } from '@/shared/components/Spinner';
@@ -12,17 +12,16 @@ import { useRouteSearch } from './hooks/useRouteSearch';
 
 export const RouteListPage = () => {
   const routesQuery = useRoutes();
+  const firstPage = routesQuery.data?.pages[0];
+  const totalQuery = useRoutesTotal(firstPage);
 
   const routes = useMemo(
     () => (routesQuery.data?.pages ?? []).flatMap((page) => page.items),
     [routesQuery.data],
   );
-  const total = routesQuery.data?.pages[0]?.total ?? 0;
+  const total = firstPage?.total ?? totalQuery.data ?? null;
   const { query, setQuery, filtered, isSearching } = useRouteSearch(routes);
 
-  // Auto-load only while browsing. During a search the filtered list shrinks, which would
-  // pull the sentinel into view on every keystroke and cascade requests — so loading is
-  // manual there.
   const sentinelRef = useIntersectionObserver<HTMLDivElement>({
     onIntersect: () => {
       if (!isSearching && routesQuery.hasNextPage && !routesQuery.isFetchingNextPage) {
@@ -49,7 +48,7 @@ export const RouteListPage = () => {
           <strong className="font-semibold text-slate-800 dark:text-slate-100">
             {filtered.length}
           </strong>{' '}
-          dari {total} rute
+          dari {total ?? '…'} rute
         </p>
       </header>
 

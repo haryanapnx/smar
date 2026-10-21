@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { K_TOTAL_STALE_MS } from '@/shared/constants';
 import { mbtaFetch } from './client';
 import { firstRelationshipId, indexIncluded, parseCollection } from './jsonapi';
 import type { JsonApiResource, JsonApiResponse } from './jsonapi.types';
@@ -134,7 +135,6 @@ export const vehicleKeys = {
   detail: (id: string) => [...vehicleKeys.all, 'detail', id] as const,
 };
 
-const K_TOTAL_STALE_MS = 60_000;
 const K_EMPTY_SCOPE: VehicleScope = { routeIds: [], tripIds: [] };
 
 type VehiclesPage = {
