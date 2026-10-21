@@ -1,7 +1,9 @@
 import { Icon } from '@/shared/components/Icon';
 import { cn } from '@/shared/lib/cn';
 import { formatCoordinates, formatRelativeTime } from '@/shared/lib/format';
-import type { Vehicle, VehicleRoute } from '../types';
+import type { Vehicle } from '../types';
+import { routeLabel } from '../lib/routeLabel';
+import { RouteMarker } from './RouteMarker';
 import { VehicleArtwork } from './VehicleArtwork';
 import { VehicleStatusBadge } from './VehicleStatusBadge';
 
@@ -10,31 +12,8 @@ export type VehicleCardProps = {
   onSelect?: (vehicle: Vehicle) => void;
 };
 
-const routeLabel = (route: VehicleRoute | null): string =>
-  route?.longName || route?.shortName || 'Tanpa rute';
-
 const cardClasses =
   'group block w-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-slate-700 dark:bg-slate-900 dark:shadow-black/20 dark:hover:border-brand-500/70 dark:hover:bg-slate-800 dark:hover:shadow-black/40';
-
-const RouteMarker = ({ route }: { route: VehicleRoute | null }) => {
-  const hasColor = Boolean(route?.color);
-  const style = hasColor
-    ? { backgroundColor: `#${route?.color}`, color: `#${route?.textColor || 'FFFFFF'}` }
-    : undefined;
-
-  return (
-    <span
-      title={route?.longName || undefined}
-      style={style}
-      className={cn(
-        'inline-flex h-9 min-w-9 shrink-0 items-center justify-center rounded-lg px-1.5 text-xs font-bold shadow-sm',
-        !hasColor && 'bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-100',
-      )}
-    >
-      <span className="max-w-16 truncate">{route?.shortName || route?.id || '—'}</span>
-    </span>
-  );
-};
 
 export const VehicleCard = ({ vehicle, onSelect }: VehicleCardProps) => {
   const stopLabel = vehicle.currentStopSequence

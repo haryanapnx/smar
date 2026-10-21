@@ -63,3 +63,12 @@ export const firstRelationshipId = (
   }
   return data.id;
 };
+
+export const relationshipIds = (resource: JsonApiResource, name: string): string[] => {
+  const relationship = resource.relationships?.[name];
+  if (!relationship || !('data' in relationship) || relationship.data == null) {
+    return [];
+  }
+  const data = relationship.data;
+  return Array.isArray(data) ? data.map((item) => item.id) : [data.id];
+};

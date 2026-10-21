@@ -21,7 +21,7 @@ export const formatRelativeTime = (value: string | null | undefined): string => 
   return date.isValid() ? date.fromNow() : '—';
 };
 
-export const formatCoordinate = (value: number | null | undefined, digits = 4): string => {
+const formatCoordinate = (value: number | null | undefined, digits = 4): string => {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
     return '—';
   }

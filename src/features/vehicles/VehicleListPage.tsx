@@ -1,10 +1,27 @@
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Skeleton } from '@/shared/components/Skeleton';
 import { patchSearchParams, readIntParam, readListParam } from '@/shared/lib/queryParams';
-import { useVehicles } from './api/useVehicles';
+import { useVehicles } from './hooks/useVehicles';
 import { VehicleList } from './components/VehicleList';
 import { VehiclesFilters } from './components/VehiclesFilters';
 import { VehiclesPagination } from './components/VehiclesPagination';
+
+const VehicleDetailModal = lazy(() =>
+  import('./components/detail').then((module) => ({ default: module.VehicleDetailModal })),
+);
+
+const ModalFallback = () => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm dark:bg-slate-950/75">
+    <div className="w-full max-w-5xl rounded-2xl bg-white p-5 shadow-2xl dark:bg-slate-900">
+      <Skeleton className="h-6 w-40" />
+      <div className="mt-5 grid gap-5 lg:grid-cols-2">
+        <Skeleton className="h-72 w-full rounded-xl" />
+        <Skeleton className="h-72 w-full rounded-xl" />
+      </div>
+    </div>
+  </div>
+);
 
 const PAGE_SIZE_OPTIONS = [12, 24, 48];
 const DEFAULT_PAGE_SIZE = 12;
@@ -19,6 +36,7 @@ export const VehicleListPage = () => {
 
   const [draftRoutes, setDraftRoutes] = useState<string[]>(routeIds);
   const [draftTrips, setDraftTrips] = useState<string[]>(tripIds);
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
 
   const routeKey = routeIds.join(',');
   const tripKey = tripIds.join(',');
@@ -31,9 +49,6 @@ export const VehicleListPage = () => {
   const query = useVehicles({ page, pageSize, routeIds, tripIds });
   const total = query.data?.total ?? 0;
 
-  // Skeleton for the grid on first load AND page transitions. `keepPreviousData`
-  // keeps `data` around so `isLoading` stays false after the first page — the
-  // grid is "loading" whenever the data shown is still the placeholder.
   const isGridLoading = query.isLoading || query.isPlaceholderData;
   const isBackgroundFetching = query.isFetching && !isGridLoading;
 
@@ -83,6 +98,7 @@ export const VehicleListPage = () => {
         isFetching={isBackgroundFetching}
         error={query.error}
         onRetry={() => query.refetch()}
+        onSelect={(vehicle) => setSelectedVehicleId(vehicle.id)}
         skeletonCount={pageSize}
       />
 
@@ -96,6 +112,15 @@ export const VehicleListPage = () => {
         isLoading={query.isLoading}
         isFetching={isBackgroundFetching}
       />
+
+      {selectedVehicleId ? (
+        <Suspense fallback={<ModalFallback />}>
+          <VehicleDetailModal
+            vehicleId={selectedVehicleId}
+            onClose={() => setSelectedVehicleId(null)}
+          />
+        </Suspense>
+      ) : null}
     </section>
   );
 };

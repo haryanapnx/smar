@@ -5,11 +5,19 @@ export type VehicleRoute = {
   color: string;
   textColor: string;
   description: string;
+  directionNames: string[];
 };
 
 export type VehicleStop = {
   id: string;
   name: string;
+};
+
+export type VehicleTrip = {
+  id: string;
+  headsign: string;
+  name: string;
+  directionId: number | null;
 };
 
 export type Vehicle = {
@@ -22,6 +30,21 @@ export type Vehicle = {
   updatedAt: string | null;
   route: VehicleRoute | null;
   stop: VehicleStop | null;
+};
+
+export type VehicleDetail = Vehicle & {
+  bearing: number | null;
+  speed: number | null;
+  occupancyStatus: string | null;
+  revenue: string | null;
+  directionId: number | null;
+  trip: VehicleTrip | null;
+};
+
+export type TripStops = {
+  tripId: string;
+  stops: VehicleStop[];
+  total: number;
 };
 
 export type VehiclesQuery = {
