@@ -57,7 +57,7 @@ Copy `.env.example` to `.env.local` (git-ignored) and fill in what you need:
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `VITE_MBTA_API_KEY` | no | Raises the MBTA rate limit (about 20 req/min without a key). Sent as `X-API-Key`. |
+| `VITE_MBTA_API_KEY` | yes | Sent as `X-API-Key` on every request. If it is left empty the request goes out without the header and the API's own default limits apply. |
 | `VITE_MBTA_API_BASE_URL` | no | Overrides the API base URL (defaults to `https://api-v3.mbta.com`). |
 
 > `VITE_*` values are baked into the client bundle at build time. Do not put real secrets there.
@@ -207,6 +207,9 @@ Pagination is offset-based, matching the MBTA API:
    the position. Changing filters resets to page 1.
 5. While a page is loading, the grid shows skeletons shaped like the cards and the pagination
    stays stable (`keepPreviousData`); moving page smoothly scrolls back to the top.
+6. The feed is live and can shrink below the page in the URL. That page then comes back empty, so
+   the app snaps the URL back to the last valid page and the range text is clamped rather than
+   printing something like "25–24 dari 24".
 
 ### UI
 
@@ -239,6 +242,7 @@ they are covered by manual checks.
 ## Notes
 
 - UI copy is Indonesian (it's the product language); code and this README are English.
-- The public MBTA API allows roughly 20 requests/minute without a key. Add `VITE_MBTA_API_KEY`
-  for heavy use or demos.
+- The app expects an MBTA API key in `VITE_MBTA_API_KEY` and sends it as `X-API-Key` on every
+  request. There is no separate keyless mode: with an empty value the request simply goes out
+  without the header, and whatever limits the API applies to it are the default ones.
 - The fleet shown is the real MBTA vehicle feed, so it includes buses, ferries and trains.

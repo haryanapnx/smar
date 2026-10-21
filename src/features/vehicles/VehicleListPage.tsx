@@ -1,4 +1,4 @@
-import { Suspense, lazy, useMemo, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { routeOptionLabel, useRoutes } from '@/api/routes';
 import { tripOptionLabel, useTrips } from '@/api/trips';
 import { useVehicles } from '@/api/vehicles';
@@ -36,6 +36,16 @@ export const VehicleListPage = () => {
 
   const query = useVehicles({ page, pageSize, routeIds, tripIds });
   const total = query.data?.total ?? 0;
+
+  const isEmptyPage = page > 1 && query.data?.page === page && query.data.items.length === 0;
+
+  useEffect(() => {
+    if (!isEmptyPage) {
+      return;
+    }
+    const lastPage = Math.max(1, Math.ceil((query.data?.total ?? 0) / pageSize));
+    updateParams({ page: String(lastPage) });
+  }, [isEmptyPage, pageSize, query.data?.total, updateParams]);
 
   const routesQuery = useRoutes();
   const tripsQuery = useTrips(draftRoutes);

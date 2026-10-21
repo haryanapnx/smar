@@ -22,7 +22,7 @@ export const VehiclesPagination = ({
   isLoading = false,
   isFetching = false,
 }: VehiclesPaginationProps) => {
-  const start = total === 0 ? 0 : (page - 1) * pageSize + 1;
+  const start = total === 0 ? 0 : Math.min((page - 1) * pageSize + 1, total);
 
   const end = Math.min(page * pageSize, total);
   const isUpdating = isFetching && !isLoading;

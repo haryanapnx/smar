@@ -41,13 +41,13 @@ export const messageForStatus = (status: number): string => {
     return 'The MBTA API rejected the request (HTTP 400).';
   }
   if (status === 401 || status === 403) {
-    return 'The MBTA API key was rejected (HTTP 403). Check VITE_MBTA_API_KEY in your .env.local.';
+    return 'The MBTA API key was rejected (HTTP 403). Check VITE_MBTA_API_KEY.';
   }
   if (status === 404) {
     return 'The requested data could not be found (HTTP 404).';
   }
   if (status === 429) {
-    return 'Too many requests. The MBTA API is rate-limiting this app. Set VITE_MBTA_API_KEY in your .env.local and try again shortly.';
+    return 'Too many requests. The MBTA API is rate-limiting this app. Please try again in a moment.';
   }
   if (status >= 500) {
     return `The MBTA API is having trouble (HTTP ${status}). Please try again in a moment.`;
