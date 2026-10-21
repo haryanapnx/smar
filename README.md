@@ -146,7 +146,7 @@ src/
     NotFoundPage.tsx
   api/                     # data layer: transport, parsing, resources + query hooks
     client.ts              # fetch wrapper, X-API-Key, typed errors
-    jsonapi.ts             # JSON:API parsing, total from links.last
+    jsonapi.ts             # JSON:API parsing: envelope split, last-page offset, has-next
     jsonapi.types.ts
     types.ts               # domain types
     vehicles.ts            # mappers, fetchVehicles/fetchVehicleDetail, useVehicles/useVehicleDetail
@@ -180,8 +180,9 @@ src/
 
 - All HTTP goes through `src/api/client.ts` (never `fetch` in components). Non-2xx responses are
   mapped to readable messages, including 429 (rate limit) and 403 (bad key).
-- Responses are JSON:API. `src/api/jsonapi.ts` splits `data`/`included` and derives the **total
-  count from `links.last`** (`page[offset] + page[limit]`), since MBTA does not send it in `meta`.
+- Responses are JSON:API. `src/api/jsonapi.ts` splits `data`/`included` and reads the offset of the
+  last page from `links.last`. **MBTA never sends a total**, so the exact count comes from reading
+  that last page (see Pagination below).
 - Vehicle cards come from `GET /vehicles` with `include=route,stop,trip`, so the route colour,
   stop name and trip destination arrive in a single request.
 - React Query handles caching, deduplication and loading states. Vehicle data is live, so its
@@ -196,23 +197,31 @@ src/
 Pagination is offset-based, matching the MBTA API:
 
 1. `fetchVehicles({ page, pageSize })` sends `page[limit]` and `page[offset]`.
-2. The total is read from `links.last`, giving an accurate page count.
-3. `page` and `limit` are stored in the URL (`?page=&limit=`), so refreshes and back/forward keep
+2. The API reports no total, and `links.last` only carries the last page's offset. Counting the
+   vehicles on that page gives the exact number (`offset + vehicles on it`), instead of the
+   `offset + limit` estimate that over-counts a partially filled last page. When the response has
+   no `next` link, the count is already known and no extra request is made.
+3. That count is cached for a minute and keyed by filters + page size + last offset, so moving
+   between pages reuses it; the footer shows a skeleton while the exact number is still resolving.
+4. `page` and `limit` are stored in the URL (`?page=&limit=`), so refreshes and back/forward keep
    the position. Changing filters resets to page 1.
-4. While a page is loading, the grid shows skeletons shaped like the cards and the pagination
+5. While a page is loading, the grid shows skeletons shaped like the cards and the pagination
    stays stable (`keepPreviousData`); moving page smoothly scrolls back to the top.
 
 ### UI
 
 - Tailwind with a Transjakarta-derived `brand` palette, plus a class-based dark mode.
 - The Leaflet map is loaded lazily, so it ships in its own chunk and never blocks the list.
+- Card artwork is the LCP element, so the first row renders it `loading="eager"` with
+  `fetchpriority="high"`; every card below the fold keeps `loading="lazy"`.
 - Route badges use the route's own `color`/`text_color` from the API, not the app theme.
 
 ## Testing
 
 Vitest + React Testing Library. The suite covers the pieces most likely to break:
 
-- JSON:API parsing and total derivation.
+- JSON:API parsing, the last-page offset, and the exact vehicle total (last-page probe + cache
+  reuse across page changes).
 - API client URL building, headers, error mapping and network failures.
 - Pagination windowing and the `Pagination` component interactions.
 - URL query-param helpers.

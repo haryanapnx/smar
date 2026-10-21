@@ -10,12 +10,13 @@ import { VehicleStatusBadge } from './VehicleStatusBadge';
 export type VehicleCardProps = {
   vehicle: Vehicle;
   onSelect?: (vehicle: Vehicle) => void;
+  priority?: boolean;
 };
 
 const cardClasses =
   'group block w-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-slate-700 dark:bg-slate-900 dark:shadow-black/20 dark:hover:border-brand-500/70 dark:hover:bg-slate-800 dark:hover:shadow-black/40';
 
-export const VehicleCard = ({ vehicle, onSelect }: VehicleCardProps) => {
+export const VehicleCard = ({ vehicle, onSelect, priority = false }: VehicleCardProps) => {
   const stopLabel = vehicle.currentStopSequence
     ? `Halte ${vehicle.stop?.name || vehicle.currentStopSequence}`
     : '';
@@ -25,7 +26,7 @@ export const VehicleCard = ({ vehicle, onSelect }: VehicleCardProps) => {
 
   const content = (
     <div className="cursor-pointer">
-      <VehicleArtwork className="h-36 sm:h-40" />
+      <VehicleArtwork className="h-36 sm:h-40" priority={priority} />
 
       <div className="mt-3 flex items-center gap-2">
         <div className="max-w-[60%] truncate">

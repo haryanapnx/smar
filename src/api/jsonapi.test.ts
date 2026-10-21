@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { deriveTotal, firstRelationshipId, indexIncluded, parseCollection, relationshipIds } from './jsonapi';
+import {
+  deriveTotal,
+  firstRelationshipId,
+  hasNextPage,
+  indexIncluded,
+  parseCollection,
+  readLastOffset,
+  relationshipIds,
+} from './jsonapi';
 import type { JsonApiResource } from './jsonapi.types';
 import { vehiclesJsonApiFixture } from '@/test/fixtures/vehicles';
 
@@ -27,17 +35,38 @@ describe('deriveTotal', () => {
 });
 
 describe('parseCollection', () => {
-  it('returns items, included and the derived total', () => {
+  it('returns items, included, the estimated total and the last-page offset', () => {
     const collection = parseCollection(vehiclesJsonApiFixture);
 
     expect(collection.items).toHaveLength(2);
     expect(collection.included).toHaveLength(3);
     expect(collection.total).toBe(140);
+    expect(collection.lastOffset).toBe(138);
+    expect(collection.hasNext).toBe(false);
   });
 
   it('normalises a single resource and null payloads', () => {
     expect(parseCollection({ data: resource('y2105', 'vehicle') }).items).toHaveLength(1);
     expect(parseCollection({ data: null }).items).toEqual([]);
+  });
+});
+
+describe('readLastOffset / hasNextPage', () => {
+  it('reads the offset of the last page', () => {
+    expect(readLastOffset(vehiclesJsonApiFixture.links)).toBe(138);
+    expect(readLastOffset(undefined)).toBeNull();
+    expect(readLastOffset({ last: 'https://api-v3.mbta.com/vehicles' })).toBeNull();
+  });
+
+  it('reports whether another page follows', () => {
+    expect(hasNextPage(undefined)).toBe(false);
+    expect(hasNextPage({ last: 'https://api-v3.mbta.com/vehicles?page[offset]=138' })).toBe(false);
+    expect(
+      hasNextPage({
+        last: 'https://api-v3.mbta.com/vehicles?page[offset]=138',
+        next: 'https://api-v3.mbta.com/vehicles?page[offset]=12',
+      }),
+    ).toBe(true);
   });
 });
 

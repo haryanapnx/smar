@@ -7,6 +7,7 @@ import type {
   Vehicle,
   VehicleDetail,
   VehicleRoute,
+  VehicleScope,
   VehicleStop,
   VehicleTrip,
   VehiclesPageResult,
@@ -128,33 +129,76 @@ const toVehicleDetail = (
 export const vehicleKeys = {
   all: ['vehicles'] as const,
   list: (query: VehiclesQuery) => [...vehicleKeys.all, 'list', query] as const,
+  total: (scope: VehicleScope, pageSize: number, lastOffset: number) =>
+    [...vehicleKeys.all, 'total', { ...scope, pageSize, lastOffset }] as const,
   detail: (id: string) => [...vehicleKeys.all, 'detail', id] as const,
 };
 
-export const fetchVehicles = async (query: VehiclesQuery): Promise<VehiclesPageResult> => {
-  const { page, pageSize, routeIds, tripIds } = query;
-  const offset = (page - 1) * pageSize;
+const K_TOTAL_STALE_MS = 60_000;
+const K_EMPTY_SCOPE: VehicleScope = { routeIds: [], tripIds: [] };
 
+type VehiclesPage = {
+  items: Vehicle[];
+  lastOffset: number | null;
+  hasNext: boolean;
+};
+
+const fetchVehiclesPage = async (
+  scope: VehicleScope,
+  pageSize: number,
+  offset: number,
+): Promise<VehiclesPage> => {
   const response = await mbtaFetch<JsonApiResponse<VehicleAttributes>>('/vehicles', {
     params: {
       'page[limit]': pageSize,
       'page[offset]': offset,
       include: 'route,stop,trip',
-      'filter[route]': routeIds,
-      'filter[trip]': tripIds,
+      'filter[route]': scope.routeIds,
+      'filter[trip]': scope.tripIds,
     },
   });
 
-  const { items, included, total } = parseCollection(response);
+  const { items, included, lastOffset, hasNext } = parseCollection(response);
   const includedIndex = indexIncluded(included);
 
   return {
     items: items.map((resource) => toVehicle(resource, includedIndex)),
-    total: total ?? offset + items.length,
+    lastOffset,
+    hasNext,
+  };
+};
+
+export const fetchVehicles = async (query: VehiclesQuery): Promise<VehiclesPageResult> => {
+  const { page, pageSize, routeIds, tripIds } = query;
+  const offset = (page - 1) * pageSize;
+  const scope = { routeIds, tripIds };
+
+  const result = await fetchVehiclesPage(scope, pageSize, offset);
+
+  return {
+    items: result.items,
+    total: result.hasNext ? null : offset + result.items.length,
+    lastOffset: result.lastOffset,
+    scope,
     page,
     pageSize,
   };
 };
+
+export const fetchVehiclesTotal = async (
+  scope: VehicleScope,
+  pageSize: number,
+  lastOffset: number,
+): Promise<number> => {
+  const lastPage = await fetchVehiclesPage(scope, pageSize, lastOffset);
+
+  return lastOffset + lastPage.items.length;
+};
+
+const estimateTotal = (page: VehiclesPageResult): number =>
+  page.lastOffset === null
+    ? (page.page - 1) * page.pageSize + page.items.length
+    : page.lastOffset + page.pageSize;
 
 export const fetchVehicleDetail = async (id: string): Promise<VehicleDetail> => {
   const response = await mbtaFetch<JsonApiResponse<VehicleAttributes>>(
@@ -171,13 +215,35 @@ export const fetchVehicleDetail = async (id: string): Promise<VehicleDetail> => 
   return toVehicleDetail(resource, indexIncluded(included));
 };
 
-export const useVehicles = (query: VehiclesQuery) =>
-  useQuery({
+export const useVehicles = (query: VehiclesQuery) => {
+  const listQuery = useQuery({
     queryKey: vehicleKeys.list(query),
     queryFn: () => fetchVehicles(query),
     placeholderData: keepPreviousData,
     staleTime: 0,
   });
+
+  const page = listQuery.data;
+  const scope = page?.scope ?? K_EMPTY_SCOPE;
+  const pageSize = page?.pageSize ?? query.pageSize;
+  const lastOffset = page?.lastOffset ?? 0;
+  const needsTotal = page?.total === null && page.lastOffset !== null;
+
+  const totalQuery = useQuery({
+    queryKey: vehicleKeys.total(scope, pageSize, lastOffset),
+    queryFn: () => fetchVehiclesTotal(scope, pageSize, lastOffset),
+    enabled: needsTotal,
+    staleTime: K_TOTAL_STALE_MS,
+  });
+
+  return {
+    ...listQuery,
+    data: page
+      ? { ...page, total: page.total ?? totalQuery.data ?? estimateTotal(page) }
+      : undefined,
+    isTotalLoading: needsTotal && totalQuery.isLoading,
+  };
+};
 
 export const useVehicleDetail = (id: string | null) =>
   useQuery({

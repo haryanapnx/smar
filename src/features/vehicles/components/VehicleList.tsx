@@ -16,6 +16,8 @@ export type VehicleListProps = {
   skeletonCount?: number;
 };
 
+const K_EAGER_CARD_COUNT = 4;
+
 export const VehicleList = ({
   vehicles,
   isLoading,
@@ -27,11 +29,7 @@ export const VehicleList = ({
 }: VehicleListProps) => {
   if (isLoading) {
     return (
-      <div
-        role="status"
-        aria-busy="true"
-        className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
-      >
+      <div role="status" aria-busy="true" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <span className="sr-only">Memuat kendaraan…</span>
         {Array.from({ length: skeletonCount }).map((_, index) => (
           <VehicleCardSkeleton key={index} />
@@ -63,8 +61,13 @@ export const VehicleList = ({
         isUpdating && 'opacity-60',
       )}
     >
-      {vehicles.map((vehicle) => (
-        <VehicleCard key={vehicle.id} vehicle={vehicle} onSelect={onSelect} />
+      {vehicles.map((vehicle, index) => (
+        <VehicleCard
+          key={vehicle.id}
+          vehicle={vehicle}
+          onSelect={onSelect}
+          priority={index < K_EAGER_CARD_COUNT}
+        />
       ))}
     </div>
   );

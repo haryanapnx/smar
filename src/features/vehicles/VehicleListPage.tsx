@@ -133,7 +133,7 @@ export const VehicleListPage = () => {
         pageSizeOptions={K_PAGE_SIZE_OPTIONS}
         onPageChange={handlePageChange}
         onPageSizeChange={(size) => updateParams({ limit: String(size), page: '1' })}
-        isLoading={query.isLoading}
+        isLoading={query.isLoading || query.isTotalLoading}
         isFetching={isBackgroundFetching}
       />
 

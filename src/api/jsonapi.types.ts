@@ -34,7 +34,12 @@ export type JsonApiResponse<TAttributes = Record<string, unknown>> = {
 export type JsonApiCollection<TAttributes = Record<string, unknown>> = {
   items: JsonApiResource<TAttributes>[];
   included: JsonApiResource[];
+  /** Estimate from `links.last`: last page offset + limit. Over-counts a partial last page. */
   total: number | null;
+  /** Offset of the last page, read from `links.last`. */
+  lastOffset: number | null;
+  /** Whether `links.next` exists — false means the current page is the last one. */
+  hasNext: boolean;
 };
 
 export const resourceKey = (type: string, id: string): string => `${type}:${id}`;

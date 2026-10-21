@@ -49,9 +49,22 @@ export type VehiclesQuery = {
   tripIds: string[];
 };
 
+export type VehicleScope = {
+  routeIds: string[];
+  tripIds: string[];
+};
+
 export type VehiclesPageResult = {
   items: Vehicle[];
-  total: number;
+  /**
+   * Exact total once the current page is the last one; `null` while the last page still has to
+   * be counted, because the MBTA API reports no total for a collection.
+   */
+  total: number | null;
+  /** Offset of the last page, read from `links.last`. */
+  lastOffset: number | null;
+  /** The filters this page was fetched with, so the total count stays in sync with the list. */
+  scope: VehicleScope;
   page: number;
   pageSize: number;
 };

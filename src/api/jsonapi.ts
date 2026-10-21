@@ -8,22 +8,38 @@ import type {
 } from './jsonapi.types';
 import { resourceKey } from './jsonapi.types';
 
-export const deriveTotal = (links?: JsonApiLinks, fallbackLimit?: number): number | null => {
-  if (!links?.last) {
+const readPageParam = (url: string | undefined, key: string): number | null => {
+  if (!url) {
     return null;
   }
   try {
-    const url = new URL(links.last, env.mbtaApiBaseUrl);
-    const offset = Number(url.searchParams.get(K_PAGE_OFFSET));
-    const limit = Number(url.searchParams.get(K_PAGE_LIMIT) ?? fallbackLimit);
-    if (!Number.isFinite(offset) || !Number.isFinite(limit) || limit <= 0) {
+    const raw = new URL(url, env.mbtaApiBaseUrl).searchParams.get(key);
+    if (raw === null || raw === '') {
       return null;
     }
-    return offset + limit;
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : null;
   } catch {
     return null;
   }
 };
+
+export const deriveTotal = (links?: JsonApiLinks, fallbackLimit?: number): number | null => {
+  const offset = readPageParam(links?.last, K_PAGE_OFFSET);
+  if (offset === null) {
+    return null;
+  }
+  const limit = readPageParam(links?.last, K_PAGE_LIMIT) ?? fallbackLimit;
+  if (limit === undefined || !Number.isFinite(limit) || limit <= 0) {
+    return null;
+  }
+  return offset + limit;
+};
+
+export const readLastOffset = (links?: JsonApiLinks): number | null =>
+  readPageParam(links?.last, K_PAGE_OFFSET);
+
+export const hasNextPage = (links?: JsonApiLinks): boolean => Boolean(links?.next);
 
 export const parseCollection = <TAttributes>(
   response: JsonApiResponse<TAttributes>,
@@ -34,6 +50,8 @@ export const parseCollection = <TAttributes>(
     items,
     included: response.included ?? [],
     total: deriveTotal(response.links),
+    lastOffset: readLastOffset(response.links),
+    hasNext: hasNextPage(response.links),
   };
 };
 
