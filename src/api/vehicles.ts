@@ -92,6 +92,7 @@ const toVehicle = (
 ): Vehicle => {
   const attributes = resource.attributes;
   const routeId = firstRelationshipId(resource, 'route');
+  const tripId = firstRelationshipId(resource, 'trip');
   const stopId = firstRelationshipId(resource, 'stop');
 
   return {
@@ -103,6 +104,7 @@ const toVehicle = (
     currentStopSequence: attributes.current_stop_sequence ?? null,
     updatedAt: attributes.updated_at ?? null,
     route: toRoute(routeId ? includedIndex.get(resourceKey('route', routeId)) : undefined),
+    trip: toTrip(tripId ? includedIndex.get(resourceKey('trip', tripId)) : undefined),
     stop: toStop(stopId ? includedIndex.get(resourceKey('stop', stopId)) : undefined),
   };
 };
@@ -112,7 +114,6 @@ const toVehicleDetail = (
   includedIndex: Map<string, JsonApiResource>,
 ): VehicleDetail => {
   const attributes = resource.attributes;
-  const tripId = firstRelationshipId(resource, 'trip');
 
   return {
     ...toVehicle(resource, includedIndex),
@@ -121,7 +122,6 @@ const toVehicleDetail = (
     occupancyStatus: attributes.occupancy_status ?? null,
     revenue: attributes.revenue ?? null,
     directionId: attributes.direction_id ?? null,
-    trip: toTrip(tripId ? includedIndex.get(resourceKey('trip', tripId)) : undefined),
   };
 };
 
@@ -139,7 +139,7 @@ export const fetchVehicles = async (query: VehiclesQuery): Promise<VehiclesPageR
     params: {
       'page[limit]': pageSize,
       'page[offset]': offset,
-      include: 'route,stop',
+      include: 'route,stop,trip',
       'filter[route]': routeIds,
       'filter[trip]': tripIds,
     },

@@ -30,6 +30,7 @@ export type Vehicle = {
   currentStopSequence: number | null;
   updatedAt: string | null;
   route: VehicleRoute | null;
+  trip: VehicleTrip | null;
   stop: VehicleStop | null;
 };
 
@@ -39,7 +40,6 @@ export type VehicleDetail = Vehicle & {
   occupancyStatus: string | null;
   revenue: string | null;
   directionId: number | null;
-  trip: VehicleTrip | null;
 };
 
 export type VehiclesQuery = {
@@ -64,6 +64,7 @@ export type Route = {
   color: string;
   textColor: string;
   description: string;
+  directionNames: string[];
 };
 
 export type RoutesQuery = {

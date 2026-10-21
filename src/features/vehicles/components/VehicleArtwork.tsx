@@ -14,7 +14,7 @@ export const VehicleArtwork = ({ className }: VehicleArtworkProps) => (
   >
     <img
       src={busImage}
-      alt="Bus Transjakarta"
+      alt="Bus"
       loading="lazy"
       className="h-full w-full object-cover dark:brightness-[.82] dark:contrast-[.92]"
     />

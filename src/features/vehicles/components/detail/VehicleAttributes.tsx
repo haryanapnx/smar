@@ -2,7 +2,7 @@ import { formatCoordinates, formatDateTime } from '@/shared/lib/format';
 import { getOccupancyLabel, getRevenueLabel } from '@/shared/lib/statusLabels';
 import { routeLabel } from '../../lib/routeLabel';
 import type { VehicleDetail } from '@/api/types';
-import { RouteMarker } from '../RouteMarker';
+import { RouteMarker } from '@/shared/components/RouteMarker';
 import { VehicleArtwork } from '../VehicleArtwork';
 import { VehicleStatusBadge } from '../VehicleStatusBadge';
 import { AttributeRow } from './AttributeRow';

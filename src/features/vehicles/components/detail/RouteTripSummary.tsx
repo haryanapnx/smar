@@ -1,7 +1,7 @@
 import { getRevenueLabel } from '@/shared/lib/statusLabels';
 import { routeLabel } from '../../lib/routeLabel';
 import type { VehicleDetail } from '@/api/types';
-import { RouteMarker } from '../RouteMarker';
+import { RouteMarker } from '@/shared/components/RouteMarker';
 import { directionText, stopText, tripText } from '../../lib/detailText';
 
 export type RouteTripSummaryProps = {

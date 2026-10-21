@@ -37,8 +37,6 @@ export const VehicleListPage = () => {
   const query = useVehicles({ page, pageSize, routeIds, tripIds });
   const total = query.data?.total ?? 0;
 
-  // Filter options: routes are loaded lazily page by page; trips are scoped to the
-  // routes currently being drafted (unfiltered /trips times out on the MBTA side).
   const routesQuery = useRoutes();
   const tripsQuery = useTrips(draftRoutes);
 
@@ -58,7 +56,7 @@ export const VehicleListPage = () => {
     [tripsQuery.data],
   );
 
-  const isGridLoading = query.isLoading || query.isPlaceholderData;
+  const isGridLoading = query.isLoading || query.isPlaceholderData || query.isFetching;
   const isBackgroundFetching = query.isFetching && !isGridLoading;
 
   const handlePageChange = (next: number) => {
@@ -82,10 +80,10 @@ export const VehicleListPage = () => {
     <section className="flex flex-col gap-5 pb-10">
       <header>
         <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white">
-          Fleet Management
+          Manajemen Armada
         </h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Monitor armada Transjakarta secara real-time di seluruh rute.
+          Monitor armada Bus secara real-time di seluruh rute.
         </p>
       </header>
 

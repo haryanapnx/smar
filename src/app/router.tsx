@@ -6,6 +6,10 @@ const VehiclesPage = lazy(() =>
   import('@/pages/VehiclesPage').then((module) => ({ default: module.VehiclesPage })),
 );
 
+const RoutesPage = lazy(() =>
+  import('@/pages/RoutesPage').then((module) => ({ default: module.RoutesPage })),
+);
+
 const NotFoundPage = lazy(() =>
   import('@/pages/NotFoundPage').then((module) => ({ default: module.NotFoundPage })),
 );
@@ -17,6 +21,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/vehicles" replace /> },
       { path: 'vehicles', element: <VehiclesPage /> },
+      { path: 'routes', element: <RoutesPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

@@ -11,6 +11,7 @@ type RouteAttributes = {
   color: string;
   text_color: string;
   description: string;
+  direction_names: string[];
 };
 
 const toRoute = (resource: { id: string; attributes: unknown }): Route => {
@@ -22,6 +23,7 @@ const toRoute = (resource: { id: string; attributes: unknown }): Route => {
     color: attributes.color ?? '',
     textColor: attributes.text_color ?? '',
     description: attributes.description ?? '',
+    directionNames: attributes.direction_names ?? [],
   };
 };
 

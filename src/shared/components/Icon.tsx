@@ -6,6 +6,7 @@ export type IconName =
   | 'chevron'
   | 'close'
   | 'moon'
+  | 'search'
   | 'bus';
 
 export type IconProps = {
@@ -80,6 +81,15 @@ export const Icon = ({ name, className = 'h-4 w-4' }: IconProps) => {
     return (
       <svg {...common}>
         <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z" />
+      </svg>
+    );
+  }
+
+  if (name === 'search') {
+    return (
+      <svg {...common}>
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.5-3.5" />
       </svg>
     );
   }

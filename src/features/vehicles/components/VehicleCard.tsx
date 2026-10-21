@@ -3,7 +3,7 @@ import { cn } from '@/shared/lib/cn';
 import { formatCoordinates, formatRelativeTime } from '@/shared/lib/format';
 import type { Vehicle } from '@/api/types';
 import { routeLabel } from '../lib/routeLabel';
-import { RouteMarker } from './RouteMarker';
+import { RouteMarker } from '@/shared/components/RouteMarker';
 import { VehicleArtwork } from './VehicleArtwork';
 import { VehicleStatusBadge } from './VehicleStatusBadge';
 
@@ -21,17 +21,23 @@ export const VehicleCard = ({ vehicle, onSelect }: VehicleCardProps) => {
     : '';
   const vehicleLabel = vehicle.label || vehicle.id;
   const routeDescription = vehicle.route?.description || 'Layanan bus';
+  const tripDestination = vehicle.trip?.headsign || vehicle.trip?.name || '—';
 
   const content = (
     <div className="cursor-pointer">
       <VehicleArtwork className="h-36 sm:h-40" />
 
-      <div className="mt-3 flex items-center gap-2.5">
-        <VehicleStatusBadge
-          status={vehicle.status}
-          stopLabel={stopLabel}
-          className="max-w-[60%] truncate px-2 py-0.5"
-        />
+      <div className="mt-3 flex items-center gap-2">
+        <div className="max-w-[60%] truncate">
+          <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+            Status
+          </span>
+          <VehicleStatusBadge
+            status={vehicle.status}
+            stopLabel={stopLabel}
+            className="w-full truncate px-2 py-0.5"
+          />
+        </div>
         <span className="h-8 w-px shrink-0 bg-slate-200 dark:bg-slate-700" aria-hidden="true" />
         <span className="min-w-0">
           <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
@@ -58,6 +64,12 @@ export const VehicleCard = ({ vehicle, onSelect }: VehicleCardProps) => {
             </p>
           </div>
         </div>
+        <h3 className="mt-3 text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400 dark:text-slate-500">
+          Trip
+        </h3>
+        <p className="mt-1 truncate text-xs font-bold leading-tight text-slate-950 dark:text-white">
+          {tripDestination}
+        </p>
       </section>
 
       <dl className="mt-4 grid grid-cols-1 divide-y divide-slate-200 border-t border-slate-200 pt-3 dark:divide-slate-700 dark:border-slate-700 min-[480px]:grid-cols-2 min-[480px]:divide-x min-[480px]:divide-y-0">
