@@ -30,19 +30,9 @@ export const AppHeader = () => {
         <AppNav className="ml-2" />
 
         <div className="ml-auto flex items-center gap-3">
-          <div className="hidden text-right text-[10px] leading-tight text-slate-400 lg:block">
-            <p className="font-medium text-slate-600">
-              <span className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-500" />
-              Live Data
-            </p>
-            <p>Terakhir diperbarui 10:24:35</p>
-          </div>
-          <div className="hidden xl:block">
+          <div className="hidden lg:block">
             <ThemeToggle />
           </div>
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-slate-200 text-xs font-bold text-slate-600 dark:bg-slate-700 dark:text-slate-200">
-            HF
-          </span>
           <button
             type="button"
             onClick={() => setIsMenuOpen((open) => !open)}

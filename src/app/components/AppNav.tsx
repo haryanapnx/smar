@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/shared/lib/cn';
+import { ThemeToggle } from './ThemeToggle';
 
 const NAV_ITEMS = [
   { to: '/vehicles', label: 'Fleet Management', active: true },
@@ -32,5 +33,6 @@ export const AppNav = ({ className, mobile = false }: { className?: string; mobi
         {item.label}
       </NavLink>
     ))}
+    <ThemeToggle />
   </nav>
 );
